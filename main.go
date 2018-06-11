@@ -13,7 +13,13 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("http://www.zhenai.com/zhenghun")
+	//resp := httpRequestUtf8("http://www.zhenai.com/zhenghun")
+	//printCityList(resp)
+	printUserByCityUrl("http://www.zhenai.com/zhenghun/aba")
+}
+
+func httpRequestUtf8(url string) []byte {
+	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
 	}
@@ -22,19 +28,19 @@ func main() {
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println("Error: status code ", resp.StatusCode)
-		return
+		return nil
 	}
 
 	e := determineEncoding(resp.Body)
 
-	//gopm get -g -v golang.org/x/net/html
+	//gopm get -g -v golang.org/x/text
 	//将其他编码方式统一转成utf8，方便获取数据
 	utf8Reader := transform.NewReader(resp.Body, e.NewDecoder())
 	all, err := ioutil.ReadAll(utf8Reader)
 	if err != nil {
 		panic(err)
 	}
-	printCityList(all)
+	return all;
 }
 
 //gopm get -g -v golang.org/x/net/html
@@ -55,4 +61,14 @@ func printCityList(contents []byte) {
 		fmt.Printf("City：%s，URL：%s\n", m[2], m[1])
 	}
 	fmt.Printf("found: %d\n", len(matches))
+}
+
+//根据城市读取信息
+func printUserByCityUrl(cityUrl string) {
+	resp := httpRequestUtf8(cityUrl)
+	re := regexp.MustCompile(`http://photo.*\.zastatic.com.*\..{3}`)
+	matches := re.FindAllSubmatch(resp, -1)
+	for _, m := range matches {
+		fmt.Printf("headPhoto：%s \n", m)
+	}
 }
