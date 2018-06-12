@@ -1,16 +1,15 @@
 package fetcher
 
 import (
-	"net/http"
+	"bufio"
+	"errors"
+	"github.com/gpmgo/gopm/modules/log"
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"io/ioutil"
-	"io"
-	"golang.org/x/text/encoding"
-	"bufio"
-	"golang.org/x/net/html/charset"
-	"errors"
-	"golang.org/x/text/encoding/unicode"
-	"github.com/gpmgo/gopm/modules/log"
+	"net/http"
 )
 
 func Fetch(url string) ([]byte, error) {
@@ -25,18 +24,20 @@ func Fetch(url string) ([]byte, error) {
 		return nil, errors.New("wrong status code")
 	}
 
-	e := determineEncoding(resp.Body)
+	bodyReader := bufio.NewReader(resp.Body)
+
+	e := determineEncoding(bodyReader)
 
 	//gopm get -g -v golang.org/x/text
 	//将其他编码方式统一转成utf8，方便获取数据
-	utf8Reader := transform.NewReader(resp.Body, e.NewDecoder())
+	utf8Reader := transform.NewReader(bodyReader, e.NewDecoder())
 	return ioutil.ReadAll(utf8Reader)
 }
 
 //gopm get -g -v golang.org/x/net/html
 //识别流的编码
-func determineEncoding(r io.Reader) encoding.Encoding {
-	bytes, err := bufio.NewReader(r).Peek(1024)
+func determineEncoding(r *bufio.Reader) encoding.Encoding {
+	bytes, err := r.Peek(1024)
 	if err != nil {
 		log.Warn("fetcher error：%v", err)
 		return unicode.UTF8

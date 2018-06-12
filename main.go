@@ -1,18 +1,17 @@
 package main
 
 import (
-	"./engine"
-	"./zhenai/parser"
+	"spider/engine"
 )
 
 func main() {
-	engine.Run(engine.Request{
-		Url:        "http://www.zhenai.com/zhenghun",
-		ParserFunc: parser.ParseCityList,
-	})
-
 	//engine.Run(engine.Request{
-	//	Url: "http://www.zhenai.com/zhenghun/daxinganling",
-	//	ParserFunc: parser.ParseUserInfo,
+	//	Url:        "http://www.zhenai.com/zhenghun",
+	//	ParserFunc: parser.ParseCityList,
 	//})
+
+	engine.Run(engine.Request{
+		Url:        "http://www.zhenai.com/zhenghun/daxinganling",
+		ParserFunc: nil,
+	})
 }

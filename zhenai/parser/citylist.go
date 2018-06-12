@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"../../engine"
 	"regexp"
+	"spider/engine"
 )
 
 const cityListRe = `<a href="(http://www.zhenai.com/zhenghun/[0-9a-z]+)"[^>]*>([^<]+)</a>`

@@ -1,9 +1,9 @@
 package engine
 
 import (
-	"../fetcher"
 	"fmt"
 	"log"
+	"spider/fetcher"
 )
 
 func Run(seeds ...Request) {
